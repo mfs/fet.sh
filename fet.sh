@@ -62,6 +62,16 @@ if [ -e /proc/$$/comm ]; then
 			esac
 		done
 
+	## Resolution
+	[ "$DISPLAY" ] &&
+	while read -r line; do
+		case $line in
+			*initial\ mode\ *) resolution=$line; break;;
+		esac
+	done < "$HOME/.local/share/xorg/Xorg.0.log"
+	resolution=${resolution##*initial mode }
+	resolution=${resolution% *}
+
 	## Memory
 	# loop over lines in /proc/meminfo until it reaches MemTotal,
 	# then convert the amount (second word) from KB to MB
@@ -234,7 +244,7 @@ print() {
 }
 
 # default value
-: "${info:=n user os sh wm up gtk cpu mem host kern pkgs term col n}"
+: "${info:=n user os sh wm rz up gtk cpu mem host kern pkgs term col n}"
 
 for i in $info; do
 	case $i in
@@ -242,6 +252,7 @@ for i in $info; do
 		os) print os "$ID";;
 		sh) print sh "${SHELL##*/}";;
 		wm) print wm "${wm##*/}";;
+		rz) print rz "$resolution";;
 		up) print up "$up";;
 		gtk) print gtk "${gtk# }";;
 		cpu) print cpu "$vendor$cpu";;
